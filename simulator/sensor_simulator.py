@@ -16,6 +16,7 @@ import json
 import time
 import random
 import math
+import os
 from datetime import datetime
 from typing import Dict
 
@@ -165,11 +166,11 @@ class SensorSimulator:
 
 
 if __name__ == '__main__':
-    # Configuration
-    REDIS_HOST = 'localhost'
-    REDIS_PORT = 6379
-    DEVICE_ID = 'SIMULATOR_001'
-    PUBLISH_INTERVAL = 2  # seconds
+    # Configuration - read from environment variables or use defaults
+    REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+    REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
+    DEVICE_ID = os.getenv('DEVICE_ID', 'SIMULATOR_001')
+    PUBLISH_INTERVAL = int(os.getenv('PUBLISH_INTERVAL', 2))  # seconds
 
     # Create and run simulator
     simulator = SensorSimulator(

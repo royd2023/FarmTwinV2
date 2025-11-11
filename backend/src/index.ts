@@ -10,11 +10,20 @@ import { RedisService } from './services/redisService';
 
 dotenv.config();
 
+
+const allowedOrigins = [
+  'http://localhost:5173', 
+  'http://localhost:80',
+  'http://localhost'
+]
+
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    // origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: allowedOrigins,
+    credentials: true,
     methods: ['GET', 'POST']
   }
 });

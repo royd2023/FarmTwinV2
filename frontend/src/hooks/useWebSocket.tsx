@@ -34,7 +34,7 @@ export const WebSocketProvider = ({ children }: WebSocketProviderProps) => {
   const [sensorData, setSensorData] = useState<SensorData | null>(null);
 
   useEffect(() => {
-    const socketUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+    const socketUrl = ((import.meta as any).env?.VITE_BACKEND_URL) || 'http://localhost:3000';
     const newSocket = io(socketUrl);
 
     newSocket.on('connect', () => {

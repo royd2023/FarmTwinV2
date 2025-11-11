@@ -47,26 +47,36 @@ See [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) for detailed architecture docum
 ## Quick Start
 
 ### Prerequisites
-- Node.js 18+
-- Python 3.9+
-- Redis 6+
-- Docker (optional, but recommended)
+- **Docker** & **Docker Compose** (recommended)
+- OR: Node.js 18+, Python 3.9+, Redis 6+ (for manual setup)
 
-### Option 1: Docker Compose (Recommended)
+### Option 1: Docker Compose (Recommended) ⭐
+
+**One-command startup:**
 
 ```bash
-# Clone repository
-git clone <repo-url>
-cd FarmTwinV2
-
-# Start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Access dashboard at http://localhost:5173
+docker-compose up --build
 ```
+
+Or use the startup scripts:
+
+**Windows:**
+```bash
+start.bat
+```
+
+**Linux/macOS:**
+```bash
+chmod +x start.sh
+./start.sh
+```
+
+**Access the application:**
+- 🌐 Dashboard: **http://localhost**
+- 📡 Backend API: **http://localhost:3000**
+- 📊 Health Check: **http://localhost:3000/health**
+
+For detailed Docker documentation, see [DOCKER.md](DOCKER.md)
 
 ### Option 2: Manual Setup
 

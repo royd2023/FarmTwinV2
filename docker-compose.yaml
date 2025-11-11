@@ -22,35 +22,41 @@ services:
     container_name: farmtwin-backend
     ports:
       - "3000:3000"
-    environment:
-      - PORT=3000
-      - NODE_ENV=production
-      - REDIS_URL=redis://redis:6379
-      - FRONTEND_URL=http://localhost:5173
+    env_file:
+      - ./backend/.env
+    # environment:
+    #   - PORT=${PORT}
+    #   - NODE_ENV=${NODE_ENV}
+    #   - REDIS_URL=${REDIS_URL}
+    #   - FRONTEND_URL=${FRONTEND_URL}
     depends_on:
-      - redis
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
+      redis:
+        condition: service_started
     restart: unless-stopped
     networks:
       - farmtwin-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # Frontend - React + Vite application
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    env_file:
+      - ./frontend/.env
+      # environment:
+      #   - VITE_BACKEND_URL=${VITE_BACKEND_URL}
     container_name: farmtwin-frontend
     ports:
-      - "5173:5173"
-    environment:
-      - VITE_BACKEND_URL=http://localhost:3000
+      - "80:80"
     depends_on:
-      - backend
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      backend:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - farmtwin-network
@@ -61,11 +67,16 @@ services:
       context: ./simulator
       dockerfile: Dockerfile
     container_name: farmtwin-simulator
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+    env_file:
+      - ./simulator/.env
+    # environment:
+    #   - REDIS_HOST=${REDIS_HOST}
+    #   - REDIS_PORT=${REDIS_PORT}
+    #   - DEVICE_ID=${DEVICE_ID}
+    #   - PUBLISH_INTERVAL=${PUBLISH_INTERVAL}
     depends_on:
-      - redis
+      redis:
+        condition: service_started
     restart: unless-stopped
     networks:
       - farmtwin-network
