@@ -1,13 +1,12 @@
 import { Server, Socket } from 'socket.io';
 import { RedisService } from '../services/redisService';
+import { DataProcessingService } from '../services/dataProcessingService';
 import { SensorData } from '../models/SensorData';
 
 /**
  * Initialize WebSocket event handlers and Redis subscriptions
  */
 export const initializeWebSocket = (io: Server) => {
-  const redisService = RedisService.getInstance();
-
   io.on('connection', (socket: Socket) => {
     console.log(`Client connected: ${socket.id}`);
 
@@ -60,6 +59,15 @@ const subscribeToSensorUpdates = (io: Server) => {
       const sensorData: SensorData = JSON.parse(message);
       // Broadcast to all connected clients
       io.emit('sensor:update', sensorData);
+
+      // 1. Process the data to get warnings and alerts
+      const analysis = DataProcessingService.validateSensorData(sensorData);
+
+      // 2. Combine raw data with the analysis
+      const processedData = { ...sensorData, analysis };
+
+      // 3. Broadcast the enriched data to all connected clients
+      io.emit('sensor:update', processedData);
     } catch (error) {
       console.error('Error processing sensor update:', error);
     }
