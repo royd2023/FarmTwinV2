@@ -6,7 +6,9 @@ import dotenv from 'dotenv';
 import morgan from 'morgan';
 import { initializeWebSocket } from './ws/socketHandler';
 import apiRoutes from './api/routes';
+import authRouter from './routers/authRouter';
 import { RedisService } from './services/redisService';
+import { SupabaseService } from './services/supabaseService';
 
 dotenv.config();
 
@@ -35,6 +37,7 @@ app.use(morgan('dev'));
 
 // API Routes
 app.use('/api', apiRoutes);
+app.use('/api/auth', authRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -46,7 +49,11 @@ const PORT = process.env.PORT || 3000;
 // Initialize services and start server
 const startServer = async () => {
   try {
-    // Initialize Redis connection first
+    // Initialize Supabase client
+    const supabaseService = SupabaseService.getInstance();
+    supabaseService.initialize();
+
+    // Initialize Redis connection
     const redisService = RedisService.getInstance();
     await redisService.connect();
 
@@ -57,6 +64,7 @@ const startServer = async () => {
     httpServer.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📡 WebSocket server ready`);
+      console.log(`🔐 Auth routes available at /api/auth`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);
