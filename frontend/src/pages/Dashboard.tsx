@@ -11,6 +11,13 @@ interface SensorData {
   timestamp: string;
 }
 
+const chartConfig = [
+  { key: 'temperature', label: 'Temperature Trend', color: '#ef4444' },
+  { key: 'humidity', label: 'Humidity Trend', color: '#3b82f6' },
+  { key: 'soilMoisture', label: 'Soil Moisture Trend', color: '#22c55e' },
+  { key: 'lightIntensity', label: 'Light Intensity Trend', color: '#f59e0b' },
+];
+
 // Thresholds (tomato greenhouse)
 const sensorConfig = [
   { name: 'Temperature', key: 'temperature', unit: '°F', optimalMin: 65, optimalMax: 85, criticalMin: 55, criticalMax: 95 },
@@ -78,30 +85,18 @@ const Dashboard = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SensorChart
-          data={historicalData.map(d => ({ timestamp: d.timestamp, value: d.temperature }))}
-          title="Temperature Trend"
-          dataKey="value"
-          color="#ef4444"
-        />
-        <SensorChart
-          data={historicalData.map(d => ({ timestamp: d.timestamp, value: d.humidity }))}
-          title="Humidity Trend"
-          dataKey="value"
-          color="#3b82f6"
-        />
-        <SensorChart
-          data={historicalData.map(d => ({ timestamp: d.timestamp, value: d.soilMoisture }))}
-          title="Soil Moisture Trend"
-          dataKey="value"
-          color="#22c55e"
-        />
-        <SensorChart
-          data={historicalData.map(d => ({ timestamp: d.timestamp, value: d.lightIntensity }))}
-          title="Light Intensity Trend"
-          dataKey="value"
-          color="#f59e0b"
-        />
+        {chartConfig.map(({ key, label, color }) => (
+          <SensorChart
+            key={key}
+            data={historicalData.map(d => ({
+              timestamp: d.timestamp,
+              value: Number(d[key as keyof SensorData]),
+            }))}
+            title={label}
+            dataKey="value"
+            color={color}
+          />
+        ))}
       </div>
     </div>
   );
