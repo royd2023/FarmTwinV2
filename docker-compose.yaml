@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  # Redis - In-memory data store for caching and pub/sub
+  redis:
+    image: redis:7-alpine
+    container_name: farmtwin-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - farmtwin-network
+
+  # Backend - Node.js Express + WebSocket server
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: farmtwin-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis:6379
+      - FRONTEND_URL=http://localhost:5173
+    depends_on:
+      - redis
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    restart: unless-stopped
+    networks:
+      - farmtwin-network
+
+  # Frontend - React + Vite application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: farmtwin-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_BACKEND_URL=http://localhost:3000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    restart: unless-stopped
+    networks:
+      - farmtwin-network
+
+  # Simulator - Python sensor data simulator
+  simulator:
+    build:
+      context: ./simulator
+      dockerfile: Dockerfile
+    container_name: farmtwin-simulator
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - farmtwin-network
+
+  # PostgreSQL - Database (optional, for persistent storage)
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: farmtwin-postgres
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     - POSTGRES_USER=farmtwin
+  #     - POSTGRES_PASSWORD=farmtwin_password
+  #     - POSTGRES_DB=farmtwin
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   restart: unless-stopped
+  #   networks:
+  #     - farmtwin-network
+
+volumes:
+  redis_data:
+  # postgres_data:
+
+networks:
+  farmtwin-network:
+    driver: bridge
