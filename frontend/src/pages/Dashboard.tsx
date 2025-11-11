@@ -11,6 +11,24 @@ interface SensorData {
   timestamp: string;
 }
 
+// Thresholds (tomato greenhouse)
+const sensorConfig = [
+  { name: 'Temperature', key: 'temperature', unit: '°F', optimalMin: 65, optimalMax: 85, criticalMin: 55, criticalMax: 95 },
+  { name: 'Humidity', key: 'humidity', unit: '%', optimalMin: 60, optimalMax: 80, criticalMin: 40, criticalMax: 90 },
+  { name: 'Soil Moisture', key: 'soil_moisture', unit: '%', optimalMin: 40, optimalMax: 60, criticalMin: 30, criticalMax: 75 },
+  { name: 'Light Level', key: 'light_level', unit: ' lux', optimalMin: 400, optimalMax: 800, criticalMin: 200, criticalMax: 1000 },
+  { name: 'CO₂', key: 'co2_ppm', unit: ' ppm', optimalMin: 400, optimalMax: 1000, criticalMin: 300, criticalMax: 1500 },
+];
+
+const sensorKeyMap: Record<string, keyof SensorData> = {
+  temperature: 'temperature',
+  humidity: 'humidity',
+  soil_moisture: 'soilMoisture',
+  light_level: 'lightIntensity',
+};
+
+
+
 const Dashboard = () => {
   const { sensorData, isConnected } = useWebSocket();
   const [historicalData, setHistoricalData] = useState<SensorData[]>([]);
@@ -34,32 +52,28 @@ const Dashboard = () => {
         </div>
       </div>
 
+
       {/* Sensor Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <SensorCard
-          title="Temperature"
-          value={sensorData?.temperature || 0}
-          unit="°C"
-          icon=""
-        />
-        <SensorCard
-          title="Humidity"
-          value={sensorData?.humidity || 0}
-          unit="%"
-          icon=""
-        />
-        <SensorCard
-          title="Soil Moisture"
-          value={sensorData?.soilMoisture || 0}
-          unit="%"
-          icon=""
-        />
-        <SensorCard
-          title="Light Intensity"
-          value={sensorData?.lightIntensity || 0}
-          unit="lux"
-          icon=""
-        />
+
+        {sensorConfig.map((sensor) => {
+          const dataKey = sensorKeyMap[sensor.key];
+          const value = dataKey && sensorData
+            ? Number(sensorData[dataKey])
+            : 0;
+          return (
+            <SensorCard
+              key={sensor.key}
+              name={sensor.name}
+              value={value}
+              unit={sensor.unit}
+              optimalMin={sensor.optimalMin}
+              optimalMax={sensor.optimalMax}
+              criticalMin={sensor.criticalMin}
+              criticalMax={sensor.criticalMax}
+            />
+          );
+        })}
       </div>
 
       {/* Charts */}
