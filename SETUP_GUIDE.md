@@ -40,7 +40,7 @@ docker run -d -p 6379:6379 --name farmtwin-redis redis:alpine
 
 Verify Redis is running:
 ```bash
-redis-cli ping
+docker exec farmtwin-redis redis-cli ping
 # Should return: PONG
 ```
 

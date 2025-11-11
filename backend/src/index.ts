@@ -32,23 +32,35 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Initialize WebSocket handlers
-initializeWebSocket(io);
-
-// Initialize Redis connection
-const redisService = RedisService.getInstance();
-redisService.connect().catch(console.error);
-
 const PORT = process.env.PORT || 3000;
 
-httpServer.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📡 WebSocket server ready`);
-});
+// Initialize services and start server
+const startServer = async () => {
+  try {
+    // Initialize Redis connection first
+    const redisService = RedisService.getInstance();
+    await redisService.connect();
+
+    // Initialize WebSocket handlers after Redis is connected
+    initializeWebSocket(io);
+
+    // Start HTTP server
+    httpServer.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📡 WebSocket server ready`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully...');
+  const redisService = RedisService.getInstance();
   await redisService.disconnect();
   httpServer.close(() => {
     console.log('Server closed');
