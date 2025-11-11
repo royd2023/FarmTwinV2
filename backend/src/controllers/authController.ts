@@ -46,21 +46,41 @@ export const signup = async (req: Request, res: Response) => {
       });
     }
 
-    // Insert user into users table
+    // Insert user into users table with detailed error logging
     if (authData.user) {
-      const { error: dbError } = await supabase
+      console.log('Attempting to insert user into database:', {
+        id: authData.user.id,
+        email: authData.user.email,
+        full_name: fullName || null,
+        role: 'user'
+      });
+
+      const { data: insertData, error: dbError } = await supabase
         .from('users')
         .insert({
           id: authData.user.id,
           email: authData.user.email,
           full_name: fullName || null,
-          role: 'user'
-        });
+          role: 'user',
+          password_hash: '' // Placeholder - actual password is in auth.users
+        })
+        .select();
 
       if (dbError) {
-        console.error('Database insert error:', dbError);
-        // Note: User is created in auth but not in users table
-        // You may want to handle this case differently
+        console.error('❌ Database insert error details:', {
+          message: dbError.message,
+          details: dbError.details,
+          hint: dbError.hint,
+          code: dbError.code
+        });
+        // Return error to see what's happening
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to create user profile',
+          details: dbError.message
+        });
+      } else {
+        console.log('✅ User successfully inserted into database:', insertData);
       }
     }
 
