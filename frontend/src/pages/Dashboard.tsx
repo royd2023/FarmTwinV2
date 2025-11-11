@@ -40,25 +40,25 @@ const Dashboard = () => {
           title="Temperature"
           value={sensorData?.temperature || 0}
           unit="°C"
-          icon="🌡️"
+          icon=""
         />
         <SensorCard
           title="Humidity"
           value={sensorData?.humidity || 0}
           unit="%"
-          icon="💧"
+          icon=""
         />
         <SensorCard
           title="Soil Moisture"
           value={sensorData?.soilMoisture || 0}
           unit="%"
-          icon="🌱"
+          icon=""
         />
         <SensorCard
           title="Light Intensity"
           value={sensorData?.lightIntensity || 0}
           unit="lux"
-          icon="☀️"
+          icon=""
         />
       </div>
 

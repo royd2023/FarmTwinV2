@@ -9,14 +9,14 @@ export const initializeWebSocket = (io: Server) => {
   const redisService = RedisService.getInstance();
 
   io.on('connection', (socket: Socket) => {
-    console.log(`✅ Client connected: ${socket.id}`);
+    console.log(`Client connected: ${socket.id}`);
 
     // Send initial sensor data on connection
     sendCurrentSensorData(socket);
 
     // Handle client disconnection
     socket.on('disconnect', () => {
-      console.log(`❌ Client disconnected: ${socket.id}`);
+      console.log(`Client disconnected: ${socket.id}`);
     });
 
     // Handle sensor data requests

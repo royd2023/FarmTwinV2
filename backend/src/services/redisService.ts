@@ -33,9 +33,9 @@ export class RedisService {
       await this.subscriber.connect();
 
       this.connected = true;
-      console.log('📦 Redis connected successfully');
+      console.log('Redis connected successfully');
     } catch (error) {
-      console.error('❌ Redis connection failed:', error);
+      console.error('Redis connection failed:', error);
       this.connected = false;
       throw error;
     }
@@ -48,7 +48,7 @@ export class RedisService {
     if (this.client) await this.client.quit();
     if (this.subscriber) await this.subscriber.quit();
     this.connected = false;
-    console.log('📦 Redis disconnected');
+    console.log('Redis disconnected');
   }
 
   /**
@@ -95,6 +95,6 @@ export class RedisService {
     if (!this.subscriber) throw new Error('Redis subscriber not initialized');
 
     await this.subscriber.subscribe(channel, callback);
-    console.log(`📡 Subscribed to channel: ${channel}`);
+    console.log(`Subscribed to channel: ${channel}`);
   }
 }

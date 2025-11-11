@@ -55,8 +55,8 @@ const startServer = async () => {
 
     // Start HTTP server
     httpServer.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📡 WebSocket server ready`);
+      console.log(`Server running on port ${PORT}`);
+      console.log(`WebSocket server ready`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);

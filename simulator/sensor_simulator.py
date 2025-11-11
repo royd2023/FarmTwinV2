@@ -35,8 +35,8 @@ class SensorSimulator:
         # Time tracking for daily cycles
         self.start_time = time.time()
 
-        print(f"✅ Sensor Simulator initialized (Device ID: {device_id})")
-        print(f"📡 Connected to Redis at {redis_host}:{redis_port}")
+        print(f"Sensor Simulator initialized (Device ID: {device_id})")
+        print(f"Connected to Redis at {redis_host}:{redis_port}")
 
     def get_time_of_day_factor(self) -> float:
         """
@@ -133,12 +133,12 @@ class SensorSimulator:
             # Publish to pub/sub channel
             self.redis_client.publish('sensor:updates', json.dumps(data))
 
-            print(f"📊 {data['timestamp'][:19]} | Temp: {data['temperature']}°C | "
+            print(f"{data['timestamp'][:19]} | Temp: {data['temperature']}°C | "
                   f"Humidity: {data['humidity']}% | Soil: {data['soilMoisture']}% | "
                   f"Light: {data['lightIntensity']} lux")
 
         except Exception as e:
-            print(f"❌ Error publishing data: {e}")
+            print(f"Error publishing data: {e}")
 
     def run(self, interval: int = 2):
         """
@@ -147,7 +147,7 @@ class SensorSimulator:
         Args:
             interval: Time between sensor readings in seconds (default: 2)
         """
-        print(f"\n🚀 Starting sensor simulation (publishing every {interval}s)")
+        print(f"\nStarting sensor simulation (publishing every {interval}s)")
         print("Press Ctrl+C to stop\n")
 
         try:
@@ -157,12 +157,12 @@ class SensorSimulator:
                 time.sleep(interval)
 
         except KeyboardInterrupt:
-            print("\n\n⏹️  Simulator stopped by user")
+            print("\n\nSimulator stopped by user")
         except Exception as e:
-            print(f"\n❌ Error in simulator: {e}")
+            print(f"\nError in simulator: {e}")
         finally:
             self.redis_client.close()
-            print("👋 Redis connection closed")
+            print("Redis connection closed")
 
 
 if __name__ == '__main__':
